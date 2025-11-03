@@ -1,4 +1,4 @@
-function vortnew = advanceVort(stmfunc,vort,Nx,Ny,dx,dy,dt,Re,t)
+function vortnew = advanceVortImplicit(stmfunc,vort,Nx,Ny,dx,dy,dt,Re,t)
 %Using the backward euler discretization
 C = dx^2/dt; k = dx/dy;
 ngs = (Nx-2) * (Ny-2);

@@ -1,16 +1,30 @@
+timeUpdateMethod = "I"; % E = Explicit, I = implicit
+
+%Importing general functions
+addpath("./General functions");
+
 %Initializing parameters
-Re = 27;
-Nx = 51; Ny = 21;
-Lx = 3; Ly = 1;
+T = readtable("./Parameters.txt");
+Re = T.Re;
+Nx = T.Nx; Ny = T.Ny;
+Lx = T.Lx; Ly = T.Ly;
 
 x = linspace(0,Lx,Nx); dx = x(2) -x(1);
 y = linspace(0,Ly,Ny); dy = y(2) - y(1);
-ic = 1.5/dx; jc = 0.5/dy;
 
 [x2,y2] = meshgrid(x,y);
-c_u = [];
+if timeUpdateMethod == "E"
+    dt = T.dte; 
+else
+    dt = T.dti;
+end
 
-dt = 0.01; tf = 1; Nmax = tf/dt;
+tf = T.tf; 
+Nmax = tf/dt;
+
+%Finding indices of point c
+ic = T.cx/dx; jc = T.cy/dy;
+c_u = [];
 
 %Generating A matrix
 [A] = assembleA(Nx,Ny,dx,dy);
@@ -22,8 +36,11 @@ t = 0;
 %Solving for streamfunction
 for i = 1:Nmax
     stmfunc = solve_Poisson(vort,A,Nx,Ny);
-    vort = advanceVort(stmfunc,vort,Nx,Ny,dx,dy,dt,Re,t);
-    c_u = [c_u (stmfunc(ic,jc+1)-stmfunc(ic,jc-1))/2/dy];
+    if timeUpdateMethod == "E"
+        vort = advanceVortExplicit(stmfunc,vort,Nx,Ny,dx,dy,dt,Re,t);
+    else
+        vort = advanceVortImplicit(stmfunc,vort,Nx,Ny,dx,dy,dt,Re,t);
+    end
     t = t + dt
 end
 
@@ -42,9 +59,13 @@ v = [0, zeros(1,Ny-2), 0;
     zeros(Nx-2,1), v, zeros(Nx-2,1);
     0, zeros(1,Ny-2), 0];
 
+figure
 quiver(x2,y2,u',v')
-%contourf(x2,y2,stmfunc')
-%contourf(x2,y2,vort')
+title("Flow velocity at tf");
+figure
+contourf(x2,y2,stmfunc')
+title("Streamfunction at tf");
+
 %% 
 
 %plotting u on c
@@ -68,6 +89,4 @@ xlabel('Frequency (Hz)');
 ylabel('Amplitude');
 title('Single-Sided Amplitude Spectrum of c\_u(t)');
 grid on;
-
-
 
