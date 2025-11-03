@@ -21,7 +21,7 @@ end
 %North points
 for i=2:Nx-3
     j=Ny-2;
-        vortnorthbc = -2*stmfunc(i,j)/dy/dy -Unorth(t)/dy;
+        vortnorthbc = -2*stmfunc(i,j)/dy/dy -Unorth(t,(i-1)*dx,(j-1)*dy)/dy;
         po = i + (j-1) * (Nx-2);
         A(po,po)       = (4 * C + 8/Re *(1+k^2)); % (i,j)
         A(po,po+1)     = k*(0-stmfunc(i,j-1)) - 4/Re;% (i+1,j)
@@ -73,7 +73,7 @@ i = 1;
 %NorthEast points
 i = Nx-2;
     j=Ny-2;
-        vortnorthbc = -2*stmfunc(i,j)/dy/dy -Unorth(t)/dy;
+        vortnorthbc = -2*stmfunc(i,j)/dy/dy -Unorth(t,(i-1)*dx,(j-1)*dy)/dy;
         vorteastbc = -2*stmfunc(i,j)/dx/dx;
         po = i + (j-1) * (Nx-2);
         A(po,po)       = (4 * C + 8/Re *(1+k^2)); % (i,j)
@@ -87,7 +87,7 @@ i = Nx-2;
 %NorthWest points
 i = 1;
     j=Ny-2;
-        vortnorthbc = -2*stmfunc(i,j)/dy/dy -Unorth(t)/dy;
+        vortnorthbc = -2*stmfunc(i,j)/dy/dy -Unorth(t,(i-1)*dx,(j-1)*dy)/dy;
         vortwestbc = -2*stmfunc(i,j)/dx/dx;
         po = i + (j-1) * (Nx-2);
         A(po,po)       = (4 * C + 8/Re *(1+k^2)); % (i,j)

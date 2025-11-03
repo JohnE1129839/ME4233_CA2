@@ -74,7 +74,7 @@ end
 %North
 j = Ny-2;
     for i = 2:Nx-3
-        vortnorthbc = -2*stmfunc(i,j) -Unorth(t)/dy;
+        vortnorthbc = -2*stmfunc(i,j) -Unorth(t,(i-1)*dx,(j-1)*dy)/dy;
         fac1 = -(0 - stmfunc(i,j-1))/2/dy;
         fac2 = (stmfunc(i+1,j) - stmfunc(i-1,j))/2/dx;
         RHS(i,j) = fac1 * (vort(i+1,j)-vort(i-1,j))/2/dx + ...
@@ -86,7 +86,7 @@ j = Ny-2;
 %Northwest
 j = Ny-2;
     i = 1;
-        vortnorthbc = -2*stmfunc(i,j) -Unorth(t)/dy;
+        vortnorthbc = -2*stmfunc(i,j) -Unorth(t,(i-1)*dx,(j-1)*dy)/dy;
         vortwestbc = -2*stmfunc(i,j)/dx/dx;
         fac1 = -(0 - stmfunc(i,j-1))/2/dy;
         fac2 = (stmfunc(i+1,j) - 0)/2/dx;
@@ -97,7 +97,7 @@ j = Ny-2;
 %Northeast
 j = Ny-2;
     i = Nx-2;
-        vortnorthbc = -2*stmfunc(i,j) -Unorth(t)/dy;
+        vortnorthbc = -2*stmfunc(i,j) -Unorth(t,(i-1)*dx,(j-1)*dy)/dy;
         vorteastbc = -2*stmfunc(i,j)/dx/dx;
         fac1 = -(0 - stmfunc(i,j-1))/2/dy;
         fac2 = (0 - stmfunc(i-1,j))/2/dx;

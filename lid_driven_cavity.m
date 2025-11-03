@@ -8,7 +8,6 @@ T = readtable("./Parameters.txt");
 Re = T.Re;
 Nx = T.Nx; Ny = T.Ny;
 Lx = T.Lx; Ly = T.Ly;
-
 x = linspace(0,Lx,Nx); dx = x(2) -x(1);
 y = linspace(0,Ly,Ny); dy = y(2) - y(1);
 
@@ -18,7 +17,6 @@ if timeUpdateMethod == "E"
 else
     dt = T.dti;
 end
-
 tf = T.tf; 
 Nmax = tf/dt;
 
@@ -42,22 +40,29 @@ for i = 1:Nmax
         vort = advanceVortImplicit(stmfunc,vort,Nx,Ny,dx,dy,dt,Re,t);
     end
     t = t + dt
+    c_u = [c_u (stmfunc(ic,jc+1)-stmfunc(ic,jc-1))/2/dy];
 end
 
 %Displaying final uv
 stmfunc = [0, zeros(1,Ny-2), 0;
             zeros(Nx-2,1), stmfunc, zeros(Nx-2,1);
             0, zeros(1,Ny-2), 0];
+%% 
+
 u = (stmfunc(2:end-1, 3:end) - stmfunc(2:end-1,1:end-2))/2/dy;
 v = -(stmfunc(3:end,2:end-1) - stmfunc(1:end-2,2:end-1))/2/dx;
-
+size(u)
 u = [0, zeros(1,Ny-2), 0;
-    zeros(Nx-2,1), u, ones(Nx-2,1) * Unorth(t);
+    zeros(Nx-2,1), u, ones(Nx-2,1) * Unorth(t,((1:Nx-2)')*dx-dx,Ly); %Unorth(t,((1:Nx-2)')*dx,Ly
     0, zeros(1,Ny-2), 0];
 
 v = [0, zeros(1,Ny-2), 0;
     zeros(Nx-2,1), v, zeros(Nx-2,1);
     0, zeros(1,Ny-2), 0];
+
+vortwbc = [-2*(stmfunc(1,1)/dy^2+stmfunc(1,1)/dx^2), -2*(stmfunc(1,2:Ny-1)/dx^2), -2*(stmfunc(1,Ny)/dy^2+Unorth(t,0,Ly)+stmfunc(1,Ny)/dx^2);
+    -2*(stmfunc(2:Nx-1,1)/dy^2), vort, -2*(stmfunc((2:Nx-1),Ny)/dy^2+Unorth(t,(2:Nx-1)'*dx-dx,Ly));
+    -2*(stmfunc(Nx,1)/dy^2+stmfunc(1,1)/dx^2), -2*(stmfunc(Nx,2:Ny-1)/dx^2), -2*(stmfunc(Nx,Ny)/dy^2+Unorth(t,Lx,Ly)+stmfunc(Nx,Ny)/dx^2)];
 
 figure
 quiver(x2,y2,u',v')
@@ -65,7 +70,9 @@ title("Flow velocity at tf");
 figure
 contourf(x2,y2,stmfunc')
 title("Streamfunction at tf");
-
+figure
+contourf(x2,y2,vortwbc');
+title("Vorticity at tf");
 %% 
 
 %plotting u on c
